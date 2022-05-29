@@ -77,7 +77,7 @@ def ParseArguments():
                         help="location of directory to save to or to use to create reporing directory")
 
     parser.add_argument("-t", "--target", dest="target",
-                        help="The IP or filename of the target")
+                        help="The IP, URL or filename of the target")
 
     parser.add_argument("-w", "--wordlist", dest="wordlist",
                         help="location of wordlist")
@@ -124,7 +124,11 @@ def Options():
                 allTags.append(component)
 
             print(BLUE+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)
-            print(BLUE+"Possible Tags:"+NC)
+            print(BLUE+""" ___           _ _    _       _____               _ 
+| _ \___ _____(_) |__| |___  |_   _|_ _ __ _ ___ (_)
+|  _/ _ (_-<_-< | '_ \ / -_)   | |/ _` / _` (_-<  _ 
+|_| \___/__/__/_|_.__/_\___|   |_|\__,_\__, /__/ (_)
+                                       |___/        """+NC)
             print(BLUE+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)  
             searchList(allTags)
             exit(0)
@@ -258,10 +262,17 @@ def formatting(commands):
 
     #sort the order by the number of matches
     commands=sorted(commands, key=lambda x: x[4], reverse=False) # don't reverse so most matches are at end / seen first
-    
+
     #create an id based on current time
     now = datetime.datetime.now()
     ID=now.strftime("%h_%d_%H%M%S")
+
+    if "http" in target:
+        url = target
+        print(url)
+    else:
+        url = "http://URL"
+    
 
     for command in commands:
 
@@ -270,6 +281,7 @@ def formatting(commands):
         command[2] = command[2].replace("$wordlist", wordlist)
         command[2] = command[2].replace("$directory", directory)
         command[2] = command[2].replace("$ID", ID)
+        command[2] = command[2].replace("$URL", url)
         
         #seperate tags into a string
         tags=""
@@ -351,14 +363,23 @@ def searchTags():
             
 
     print(BLUE+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)
-    print(BLUE+"Searched Tags:"+NC)
+    print(BLUE+""" ___                  _           _   _____               _ 
+/ __| ___ __ _ _ _ __| |_  ___ __| | |_   _|_ _ __ _ ___ (_)
+\__ \/ -_) _` | '_/ _| ' \/ -_) _` |   | |/ _` / _` (_-<  _ 
+|___/\___\__,_|_| \__|_||_\___\__,_|   |_|\__,_\__, /__/ (_)
+                                               |___/        """+NC)
     print(BLUE+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)        
     searchList(tagResults)
     
-    print(BLUE+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)
-    print(BLUE+"Commands Found:"+NC)
-    print(BLUE+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)   
+    print(DARKGREY+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)
+    print(DARKGREY+"""  ___                              _      ___                 _   _ 
+ / __|___ _ __  _ __  __ _ _ _  __| |___ | __|__ _  _ _ _  __| | (_)
+| (__/ _ \ '  \| '  \/ _` | ' \/ _` (_-< | _/ _ \ || | ' \/ _` |  _ 
+ \___\___/_|_|_|_|_|_\__,_|_||_\__,_/__/ |_|\___/\_,_|_||_\__,_| (_)"""+NC)
+
+    print(DARKGREY+"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+NC)   
     formatting(results)
+
 
 ParseArguments()
 Banner()
