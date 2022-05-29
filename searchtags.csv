@@ -1,0 +1,5 @@
+"crawler","Web Crawler","Finds extentions for the target address (e.g. index.html, admin.php, /aboutus/)"
+"web","Web Exploit","These attacks and exploits target web applications and web pages"
+"bruteforce","Bruteforce Attack","These attacks make use of wordlists to systematically force a result"
+"steganography","Reverse Image Steganography","Finds files, text or other items hidden within images"
+"image","Image manipulation","Thest commands allow image manipulation and decoding"
