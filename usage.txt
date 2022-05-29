@@ -1,0 +1,28 @@
+\033[1;34mUsage:\033[0m 
+\t\033[1;34m	-h\033[0m  :: Help screen (this page)
+\t\033[1;34m	-c\033[0m  <name> :: Create Reporting Dir with the name provided
+\t\033[1;90m	-Requirements:\033[0m
+\t\033[1;90m		-d\033[0m  <directory> 
+\t\033[1;90m		-t\033[0m  <target ip> \033[1;31m*optional\033[0m	
+\t\033[1;34m	-d\033[0m  <directory> :: location of directory to save to or to use to create reporing directory
+\t\033[1;34m	-t\033[0m  <target ip> :: The IP of the target 
+\t\033[1;34m	-w\033[0m  <directory> :: location of wordlist
+
+\033[1;34mCommmands:\033[0m 
+\t\033[1;34m	-a <type> :: attack information
+
+\t\033[1;34m	-a web\033[0m  :: List Web Attacks 
+\t\033[1;90m	-Requirements:\033[0m
+\t\033[1;90m		-t\033[0m  <target ip>
+\t\033[1;90m		-d\033[0m  <directory> \033[1;31m*optional\033[0m
+\t\033[1;90m		-w\033[0m  <directory> \033[1;31m*optional\033[0m
+
+\t\033[1;34m	-a image\033[0m  :: List Image Steganography Decryption
+\t\033[1;90m	-Requirements:\033[0m
+\t\033[1;90m		-t\033[0m  <target ip>
+\t\033[1;90m		-d\033[0m  <directory> \033[1;31m*optional\033[0m
+
+
+\033[1;34mExamples:\033[0m 
+\t	GamePlan [\033[1;34m-c\033[0m <name>] [\033[1;34m-d\033[0m <directory>] [\033[1;34m-t\033[0m <target ip>]
+\t	GamePlan [\033[1;34m-t\033[0m <target ip>] [\033[1;34m-d\033[0m <directory>]

@@ -1,0 +1,37 @@
+\033[1;34m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\033[0m
+\033[1;34mWeb Crawler\033[0m
+Finds extentions for the target address (e.g. index.html, admin.php, /aboutus/)
+\033[1;34m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\033[0m
+
+\033[1;90mStandard crawler\033[0m
+scans against standart wordlist and outputs results to specified directory 
+(\033[1;90mrecomended wordlist : directory-list-2.3-medium.txt\033[0m)
+
+\t\033[1;34mferoxbuster -u http://$target -w $wordlist -o $directory/webcrawl_$ID\033[0m
+
+\033[1;90mhtml + php crawler\033[0m
+scans for html and php extentions only and outputs results to specified directory
+
+\t\033[1;34mferoxbuster -u http://$target -x html,php -o $directory/webcrawl_$ID\033[0m
+
+
+\033[1;34m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\033[0m
+\033[1;34mWeb Login Bruteforcer\033[0m
+Brute force against a web based login page
+\033[1;34m- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\033[0m
+
+\033[1;34m<extention>\033[0m : extention of the login page (e.g. /login.php)
+\033[1;34m<request>\033[0m : request to send to page (obtained via burpsuite, usually user=\033[1;34m^USER^\033[0m&pass=\033[1;34m^PASS^\033[0m))
+\033[1;34m<catch>\033[0m : catching argument signalling a failure (e.g. Username or password invalid)
+
+\033[1;90mLogin Brute\033[0m
+brute against the login with a dictionary attack and static password
+(\033[1;90mrecomended wordlist : rockyou.txt\033[0m)
+
+\t\033[1;34mhydra -L $wordlist -p <password> $target http-post-form "<extention>:<request>:<catch>" -t 30 > $directory/web_brute_$ID | tee $directory/web_brute_$ID\033[0m
+
+\033[1;90mPassword Brute\033[0m
+brute against the password with a dictionary attack and static known login 
+(\033[1;90mrecomended wordlist : rockyou.txt\033[0m)
+
+\t\033[1;34mhydra -l <login> -P $wordlist $target http-post-form "<extention>:<request>:<catch>"  -t 30 > $directory/web_brute_$ID | tee $directory/web_brute_$ID\033[0m
