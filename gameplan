@@ -3,12 +3,12 @@
 ###########################################
 # Project : GamePlan
 # File : gameplan.py
-# Version : 2.0.1
+# Version : 2.0.2
 
 ###########################################
 # Author : Connor Maddison
 # Creation Date : 05/29/2022
-# Version Date : 05/29/2022
+# Version Date : 06/01/2022
 
 ###########################################
 
@@ -29,7 +29,7 @@ BOLD="\033[1m"
 # arguments
 ########################################
 
-save_location="/usr/local/bin/" #change based on install location of csv's
+save_location="/usr/local/lib/GamePlanLibary/" #Place GamePlanLibary in /usr/local/bin (can change based on install location of csv's)
 directory=""
 target=""
 create=""
@@ -75,7 +75,7 @@ def ParseArguments():
     parser = argparse.ArgumentParser(description='GamePlan is a tool that searches a collection of commands to find the commands that best suit your pentesting needs.')
 
     parser.add_argument("-d", "--dir", dest="directory",
-                        help="location of directory to save to or to use to create reporing directory")
+                        help="location of directory to save to or to use to create reporing directory (must end in /)")
 
     parser.add_argument("-t", "--target", dest="target",
                         help="The IP, URL or filename of the target")
@@ -139,6 +139,9 @@ def Options():
         #create the reporting directory
         if directory:
             #if not empty
+            if not target:
+                #if no target leave empty
+                target = "<target>"
             createDir()
             exit(0)
         else:
@@ -239,8 +242,7 @@ def createDir():
             command="mkdir -p "+directory+"/"+create+"/"+dir
             os.system(command)
             print("Created directory :"+DARKGREY+directory+"/"+create+"/"+BLUE+dir+NC)
-        
-        
+
         #create the reporting text file
         now = datetime.datetime.now()
         command="echo \"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nPentest of : "+target+"\nDate : "+now.strftime("%h %d %Y")+"\nTime : "+now.strftime("%H:%M:%S")+"\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\" >> "+directory+"/"+create+"/report/report.txt"
