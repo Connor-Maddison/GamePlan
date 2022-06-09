@@ -27,7 +27,7 @@ if [ "$EUID" -ne 0 ]
     then echo -e $RED"Please run as root$NC"
     exit
 else
-    sudo mv -f ./GamePlanLibary /usr/local/lib/
+    sudo cp -r ./GamePlanLibary /usr/local/lib/
     echo -e $GREEN"Moved GamePlanLibary to /usr/local/lib/$NC"
     sudo chmod 755 ./gameplan
     sudo mv -f ./gameplan /usr/local/bin
