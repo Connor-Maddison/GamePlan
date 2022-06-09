@@ -29,6 +29,7 @@ if [ "$EUID" -ne 0 ]
 else
     sudo mv ./GamePlanLibary /usr/local/lib/
     echo -e $GREEN"Moved GamePlanLibary to /usr/local/lib/$NC"
+    sudo chmod 755 ./gameplan
     sudo mv ./gameplan /usr/local/bin
     echo -e $GREEN"Moved gameplan to /usr/local/bin/$NC"
     sudo rm -r ../GamePlan
