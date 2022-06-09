@@ -3,12 +3,12 @@
 ###########################################
 # Project : GamePlan
 # File : gameplan.py
-# Version : 2.0.2
+# Version : 2.1.0
 
 ###########################################
 # Author : Connor Maddison
 # Creation Date : 05/29/2022
-# Version Date : 06/01/2022
+# Version Date : 06/09/2022
 
 ###########################################
 
@@ -31,7 +31,9 @@ BOLD="\033[1m"
 
 save_location="/usr/local/lib/GamePlanLibary/" #Place GamePlanLibary in /usr/local/bin (can change based on install location of csv's)
 directory=""
-target=""
+ip=""
+url=""
+filename=""
 create=""
 wordlist=""
 search=""
@@ -65,7 +67,9 @@ def ParseArguments():
 
     global directory
     global create
-    global target
+    global ip
+    global url
+    global filename
     global wordlist
     global search
     global outputTags
@@ -77,8 +81,14 @@ def ParseArguments():
     parser.add_argument("-d", "--dir", dest="directory",
                         help="location of directory to save to or to use to create reporing directory (must end in /)")
 
-    parser.add_argument("-t", "--target", dest="target",
-                        help="The IP, URL or filename of the target")
+    parser.add_argument("-i", "--ip", dest="ip",
+                        help="The IP of the target")
+
+    parser.add_argument("-u", "--url", dest="url",
+                        help="The URL of the target")
+
+    parser.add_argument("-f", "--filename", dest="filename",
+                        help="The filename of the target")
 
     parser.add_argument("-w", "--wordlist", dest="wordlist",
                         help="location of wordlist")
@@ -96,7 +106,9 @@ def ParseArguments():
     args = parser.parse_args()
     
     directory=args.directory
-    target=args.target
+    ip=args.ip
+    url=args.url
+    filename=args.filename
     create=args.create
     wordlist=args.wordlist
     search=args.search
@@ -111,7 +123,9 @@ def Options():
 
     global directory
     global create
-    global target
+    global ip
+    global url
+    global filename
     global wordlist
     global search
     global outputTags
@@ -139,28 +153,33 @@ def Options():
         #create the reporting directory
         if directory:
             #if not empty
-            if not target:
-                #if no target leave empty
-                target = "<target>"
+            if not ip:
+                #if no ip target leave empty
+                ip = "<ip>"
             createDir()
             exit(0)
         else:
             print(RED+"Directory tag [-d, --dir] required to create a reporing directory"+NC)
     elif search:
-        if target:
-            #if not empty
-            #search against the entered tags
+        
+        if not ip:
+            #if no ip target leave empty
+            ip = "<ip>"
+        if not url:
+            #if no url target leave empty
+            url = "<url>"
+        if not filename:
+            #if no filename target leave empty
+            filename = "<filename>"
+        if not directory:
+            directory = "<enter output directory>"
+        if not wordlist:
+            wordlist = "<enter wordlist directory>"
             
-            if not directory:
-                directory = "<enter output directory>"
-            if not wordlist:
-                wordlist = "<enter wordlist directory>"
-                
-            searchTags()
-            exit(0)
+        searchTags()
+        exit(0)
 
-        else:
-            print(RED+"Target tag [-t, --target] required"+NC)
+        
         
 
 def YesNo(question):
@@ -245,7 +264,7 @@ def createDir():
 
         #create the reporting text file
         now = datetime.datetime.now()
-        command="echo \"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nPentest of : "+target+"\nDate : "+now.strftime("%h %d %Y")+"\nTime : "+now.strftime("%H:%M:%S")+"\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\" >> "+directory+"/"+create+"/report/report.txt"
+        command="echo \"- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nPentest of : "+ip+"\nDate : "+now.strftime("%h %d %Y")+"\nTime : "+now.strftime("%H:%M:%S")+"\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\" >> "+directory+"/"+create+"/report/report.txt"
         os.system(command)
 
     else:
@@ -269,22 +288,17 @@ def formatting(commands):
     #create an id based on current time
     now = datetime.datetime.now()
     ID=now.strftime("%h_%d_%H%M%S")
-
-    if "http" in target:
-        url = target
-        print(url)
-    else:
-        url = "http://URL"
     
 
     for command in commands:
 
         #replace placeholders with live values
-        command[2] = command[2].replace("$target", target)
+        command[2] = command[2].replace("$ip", ip)
+        command[2] = command[2].replace("$url", url)
+        command[2] = command[2].replace("$filename", filename)
         command[2] = command[2].replace("$wordlist", wordlist)
         command[2] = command[2].replace("$directory", directory)
         command[2] = command[2].replace("$ID", ID)
-        command[2] = command[2].replace("$URL", url)
         
         #seperate tags into a string
         tags=""
