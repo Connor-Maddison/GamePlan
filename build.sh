@@ -3,7 +3,7 @@
 ###########################################
 # Project : GamePlan
 # File : build.sh
-# Version : 1.0.1
+# Version : 1.0.2
 
 ###########################################
 # Author : Connor Maddison
@@ -27,10 +27,10 @@ if [ "$EUID" -ne 0 ]
     then echo -e $RED"Please run as root$NC"
     exit
 else
-    sudo mv ./GamePlanLibary /usr/local/lib/
+    sudo mv -f ./GamePlanLibary /usr/local/lib/
     echo -e $GREEN"Moved GamePlanLibary to /usr/local/lib/$NC"
     sudo chmod 755 ./gameplan
-    sudo mv ./gameplan /usr/local/bin
+    sudo mv -f ./gameplan /usr/local/bin
     echo -e $GREEN"Moved gameplan to /usr/local/bin/$NC"
     sudo rm -r ../GamePlan
 fi
