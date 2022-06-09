@@ -3,7 +3,7 @@
 ###########################################
 # Project : GamePlan
 # File : build.sh
-# Version : 1.0.0
+# Version : 1.0.1
 
 ###########################################
 # Author : Connor Maddison
@@ -29,7 +29,7 @@ if [ "$EUID" -ne 0 ]
 else
     sudo mv ./GamePlanLibary /usr/local/lib/
     echo -e $GREEN"Moved GamePlanLibary to /usr/local/lib/$NC"
-    sudo mv ./gameplan /usr/bin
-    echo -e $GREEN"Moved gameplan to /usr/bin/$NC"
+    sudo mv ./gameplan /usr/local/bin
+    echo -e $GREEN"Moved gameplan to /usr/local/bin/$NC"
     sudo rm -r ../GamePlan
 fi
