@@ -9,6 +9,6 @@ info:
     
     format of this text can be multiline
   required_packages: nmap, google
-  tags: Web, stego, funky
+  tags: Web, stego, funky, this, is, a ,test ,of ,multiple tags , !inD ifferent, F0rmats
 
 command: Do something with {{IP}} and {{WORDLIST}}
