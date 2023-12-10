@@ -1,0 +1,14 @@
+
+info:
+  summary: This command will do SOMETHING that is so annoyingly long that it should overflow the standard text box
+  author(s): Me
+  date_created: DD/MMM/YYYY
+  last_updated: DD/MMM/YYYY
+  desc: |
+    This is the more detailed formatted description
+    
+    format of this text can be multiline
+  required_packages: feroxbuster, something
+  tags: web,some new tag, this
+
+command: Do something with {{IP}} and {{WORDLIST}}
