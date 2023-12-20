@@ -10,7 +10,6 @@
 # Creation Date : 10/12/2023
 ###########################################
 
-import PySimpleGUI as sg
 from Gameplan_Core import Gameplan_Core
 import customtkinter as ctk
 
@@ -44,12 +43,10 @@ class Tags_Frame(ctk.CTkFrame):
         super().__init__(master)
         self.tags = tags
         self.configure(fg_color="transparent")
+        self.tag_list = []
 
         self.grid(row=0, column=1, padx=(15,5), pady=5, sticky="ew", rowspan="2")
         self.anchor = "e"
-
-        #self.tags_label = ctk.CTkLabel(self, text="Filter Tags", fg_color="transparent",justify="left", anchor="w",font=('Arial',12, "bold"))
-        #self.tags_label.grid(row=0, column=0, padx=5, pady=(5,10), sticky="ew", columnspan="5")
 
         ## | | | |  x5 columns
 
@@ -57,7 +54,6 @@ class Tags_Frame(ctk.CTkFrame):
         col_step = 0
         for tag_split in tags:
             for tag in tag_split:
-                print(tag)
                 self.tag = ctk.CTkButton(self,
                                         text=tag, 
                                         anchor="center", 
@@ -66,6 +62,7 @@ class Tags_Frame(ctk.CTkFrame):
                                         fg_color=LIGHT_SECOND,
                                         hover_color=DARK_SECOND)
                 self.tag.grid(row=row_step, column=col_step, padx=5, pady=5, sticky="ew")
+                self.tag_list.append([self.tag, tag])
                 if col_step >= 4:
                     col_step = 0
                     row_step += 1
@@ -133,9 +130,6 @@ class Command_Frame(ctk.CTkFrame):
                                     hover_color=DARK_SUCCESS)
         self.run.grid(row=0, column=1, padx=(15,0), pady=0, sticky="ne")
 
-
-        ## -> Tags,packages (as buttons?)
-
         self.tags = Tags_Frame(self, [info["info"]["tags"],info["info"]["required_packages"]])
 
 
@@ -172,28 +166,7 @@ class Filters_Segment_Frame(ctk.CTkFrame):
             self.current = ctk.CTkLabel(self, text=value, fg_color="transparent",justify="right",anchor="e")
             self.current.grid(row=index, column=1, padx=10, pady=5, sticky="ew")
             self.segments.update({key:[self.switch, self.current]})
-
-
-    def Parse_Filters(self, filter_dict, filter_type, filter, modifier=True):
-
-        ## Modifier True = Add, False = Del
-        if filter_dict is None or filter_type is None or filter is None:
-            return None
-
-        for key, value in filter_dict.items():
-            if key != filter_type and type(value) == dict:
-                self.Parse_Filters(value, filter_type, filter, modifier)
-            elif key == filter_type:
-                
-                if modifier:
-                    if filter not in value:
-                        value.append(filter)
-                else:
-                    if filter in value:
-                        value.remove(filter)
-
-
-        
+      
     def Trigger_filter(self, filter_type=None, filter=None):
 
         if filter_type is None or filter is None:
@@ -203,11 +176,13 @@ class Filters_Segment_Frame(ctk.CTkFrame):
 
         if filter not in self.active:
             self.active.append(filter)
-            self.Parse_Filters(GAMEPLAN_SESSION.FILTERS, filter_type, filter, True)
+            GAMEPLAN_SESSION.Edit_Filters(GAMEPLAN_SESSION.FILTERS, filter_type, filter, True)
             
         else:
             self.active.remove(filter)
-            self.Parse_Filters(GAMEPLAN_SESSION.FILTERS, filter_type, filter, False)
+            GAMEPLAN_SESSION.Edit_Filters(GAMEPLAN_SESSION.FILTERS, filter_type, filter, False)
+
+        self.master.master.master.master.master.Filter_Results()
 
         
 
@@ -328,142 +303,58 @@ class App(ctk.CTk):
 
         self.filters_frame = Filters_Frame(self,0,0,KNOWN_FILTERS)
 
+
+        self.created_commands = []
         self.command_container = ctk.CTkScrollableFrame(self, fg_color=GREY60)
         self.command_container.anchor = "w"
         self.command_container.grid(row=0, column=1, sticky="nsew")
         for index, command in enumerate(GAMEPLAN_SESSION.COMMAND_LIST):
             self.command = Command_Frame(self.command_container,index,command)
+            self.created_commands.append([self.command,command,index])
 
-        #self.textbox = ctk.CTkTextbox(master=self, width=400, corner_radius=15)
-        #self.textbox.grid(row=0, column=1, sticky="nsew")
-        #self.textbox.insert("0.0", "Some example text!\n" * 50)
+    def Filter_Results(self):
+        GAMEPLAN_SESSION.Filter_Commands()
+
+        if len(GAMEPLAN_SESSION.FILTERED_COMMANDS) <= 0:
+            for index, command in enumerate(self.created_commands):
+                command[0].grid(row=index)
+                    
+                for tag in command[0].tags.tag_list:
+                    tag[0].configure(state= ctk.NORMAL, fg_color=LIGHT_SECOND, hover_color=DARK_SECOND)
+            return
+        
+        for command in self.created_commands:
+            matches = False
+            row = 0
+            for index, filtered_command in enumerate(GAMEPLAN_SESSION.FILTERED_COMMANDS):
+                if command[1] == filtered_command[1]:
+                    row = index
+                    matches = True
+                    break
+            
+            if matches == True:
+                command[0].grid(row=row)
+
+                #print(command[0].tags.tag_list)
+                for tag in command[0].tags.tag_list:
+
+                    if tag[1] in (GAMEPLAN_SESSION.FILTERS["info"]["tags"] + GAMEPLAN_SESSION.FILTERS["info"]["required_packages"]):
+                       tag[0].configure(state= ctk.NORMAL, fg_color=LIGHT_SECOND, hover_color=LIGHT_SECOND)
+                    else:
+                        tag[0].configure(state= ctk.DISABLED, fg_color=GREY60, hover_color=GREY100)
+                        
+
+
+
+                
+            else:
+                if command[0].winfo_viewable():
+                    command[0].grid_remove()
+                    
+        return
 
         
 
 app = App()
 app.mainloop()
 
-
-
-quit()
-
-sg.theme('DarkTeal10')
-
-# First the window layout in 2 columns
-
-search_bar = [
-    sg.Text("Filter"),
-    sg.In(enable_events=True, 
-          key="-FILTER-",
-          expand_x=True
-          ) 
-]
-
-
-tags_headings = ['Tag', 'Count']
-packages_headings = ['Packages', 'Count']
-authors_headings = ['Authors', 'Count']
-rc_filter_commands = ['&filter', ['TEST::TEST','Filter on', 'Add to current filter']]
-
-filters_column = [
-
-    [sg.Table(values=[], 
-        headings=tags_headings,
-        auto_size_columns=True,
-        justification='left',
-        key='-KNOWN TAGS-',
-        expand_x=True,
-        expand_y=True,
-        enable_events=True,
-        select_mode=sg.TABLE_SELECT_MODE_BROWSE)],
-    [sg.Table(values=[], 
-        headings=packages_headings,
-        auto_size_columns=True,
-        justification='left',
-        key='-KNOWN PACKAGES-',
-        expand_x=True,
-        expand_y=True,
-        enable_click_events=True,
-        enable_events=True,
-        select_mode=sg.TABLE_SELECT_MODE_BROWSE)],
-    [sg.Table(values=[], 
-        headings=authors_headings,
-        auto_size_columns=True,
-        justification='left',
-        key='-KNOWN AUTHORS-',
-        expand_x=True,
-        expand_y=True,
-        enable_click_events=True,
-        enable_events=True,
-        select_mode=sg.TABLE_SELECT_MODE_BROWSE)],   
-    
-
-]
-
-output_block = [
-
-    sg.Column(filters_column, expand_y=True, expand_x=True, right_click_menu=rc_filter_commands),
-    #filters_column,
-    sg.VSeperator(),
-
-    sg.Listbox(
-            values=[], 
-            enable_events=True, 
-            key="-FILTER RETURNS-",
-            expand_x=True,
-            expand_y=True
-        )
-]
-
-
-# ----- Full layout -----
-layout = [
-    [
-        search_bar
-    ],
-    [
-        output_block
-    ]
-]
-
-window = sg.Window("Gameplan v2.0", layout, size=(700,450), resizable=True)
-GAMEPLAN_SESSION = Gameplan_Core()
-
-# Run the Event Loop
-while True:
-    event, values = window.read()
-
-    known_tags = list(GAMEPLAN_SESSION.TAGS_LIST.items())
-    
-
-    window["-KNOWN TAGS-"].update(known_tags)
-    window["-KNOWN PACKAGES-"].update(list(GAMEPLAN_SESSION.PACKAGES_LIST.items()))
-    window["-KNOWN AUTHORS-"].update(list(GAMEPLAN_SESSION.AUTHORS_LIST.items()))
-
-    if event == "Exit" or event == sg.WIN_CLOSED:
-        break
-
-    print(event, values)
-
-    if event == '-KNOWN TAGS-':
-        try:
-            selected_tag = known_tags[values[event][0]][0]
-            print(selected_tag)
-        except:
-            pass
-        
-        #print(known_tags[int(values[event])][0])
-        
-
-    if event == "-FILTER-":
-        filter_request = values["-FILTER-"]
-        #try:
-            
-        #except:
-
-        filter_list = [filter_request] # temp
-
-        window["-FILTER RETURNS-"].update(filter_list)
-    
-
-window.close()

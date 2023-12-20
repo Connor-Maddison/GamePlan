@@ -52,6 +52,7 @@ class Gameplan_Core:
         self.AUTHORS_LIST = {}
         self.PACKAGES_LIST = {}
         self.FILTERS = {}
+        self.FILTERED_COMMANDS = []
 
         self.Import_All_Commands()        
         self.FILTERS = self.Create_Empty_Command_File(self.COMMAND_LIST[0])
@@ -60,6 +61,8 @@ class Gameplan_Core:
         #-------------------------------------------------------------------------------------------------------------
         
     def Format_Command(self, unformatted_command):
+
+        ## Add provided info into the command variables
 
         format_command = unformatted_command
         ##Extract all the tags in the standard format
@@ -122,6 +125,7 @@ class Gameplan_Core:
     
 
     def Import_All_Commands(self):
+        ## Pull in all the commands
         command_dir = listdir(f'{self.CURRENT_PATH}/commands')
         for command_file in command_dir:
             returned_yaml = self.Read_Yaml_File(command_file)
@@ -142,6 +146,25 @@ class Gameplan_Core:
             else:
                 level_dict.update({key: []})
         return level_dict
+    
+
+    def Edit_Filters(self, filter_dict, filter_type, filter, modifier=True):
+
+        ## Modifier True = Add, False = Del
+        if filter_dict is None or filter_type is None or filter is None:
+            return None
+
+        for key, value in filter_dict.items():
+            if key != filter_type and type(value) == dict:
+                self.Edit_Filters(value, filter_type, filter, modifier)
+            elif key == filter_type:
+                
+                if modifier:
+                    if filter not in value:
+                        value.append(filter)
+                else:
+                    if filter in value:
+                        value.remove(filter)
 
     def Gather_Info(self):
         #go through all commands info and gather usefull facts and tags that can be filtered on
@@ -181,6 +204,40 @@ class Gameplan_Core:
 
             logging.info(f'Loaded info for {command["info"]["summary"]}')
                  
+
+    def Match_Filters(self, command_dict, filter_dict):
+
+        matches = 0
+
+        if command_dict is None or filter_dict is None:
+            return None
+
+        for key, value in filter_dict.items():
+            command_ref = command_dict.get(key)
+            if type(value) == dict:
+                matches += self.Match_Filters(command_dict[key], value)
+            elif type(command_ref) == list:
+                for component in command_ref:
+                    if component in value:
+                        matches += 1
+            else:
+                if command_ref in value:
+                    matches += 1
+
+        return matches
+
+    def Filter_Commands(self):
+
+        self.FILTERED_COMMANDS.clear()
+
+        for command in self.COMMAND_LIST:
+
+            match_count = self.Match_Filters(command,self.FILTERS)
+            if match_count > 0:
+                self.FILTERED_COMMANDS.append([match_count, command])
+
+        self.FILTERED_COMMANDS.sort(key=lambda x: x[0], reverse=True)
+
 
 #test = Gameplan_Core()
 
